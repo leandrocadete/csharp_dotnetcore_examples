@@ -1,2 +1,2 @@
 # csharp_dotnetcore_examples
-Many cshpar dotnet core examples
+Many csharp dotnet core examples
