@@ -13,5 +13,6 @@
   </Target>
   <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
     <Copy SourceFiles="teste1.xlsx" DestinationFolder="$(PublishDir)" />
+    <Copy SourceFiles="por.traineddata" DestinationFolder="$(PublishDir)" />
   </Target>
 </Project>

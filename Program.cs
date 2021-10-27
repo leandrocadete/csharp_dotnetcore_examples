@@ -9,7 +9,32 @@ namespace csharp_dotnetcore_examples {
     class Program {
         static void Main (string[] args) {
 
-            ReadExcel("teste1.xlsx");
+            //ReadExcel("teste1.xlsx");
+            string filePath = "por.traineddata";
+            using (System.IO.FileStream fs = new System.IO.FileStream(filePath, System.IO.FileMode.Open))
+            {
+                if(fs.Length % 4 != 0) { 
+                    Int64 qtds = fs.Length;
+                    byte[] buffer = new byte[qtds];
+                    fs.Read(buffer, 0, (int) qtds);
+                    string strOut = System.Convert.ToBase64String(buffer);
+
+                    int length = strOut.Length/4;
+                    int mod4 = strOut.Length % 4;
+                    System.Console.WriteLine("length => {0} = {1}/{2}", length, strOut.Length, 4);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        System.Console.WriteLine("substring {0}, {1}", i*length, (i+1) * length);
+                        if(i == 3) {
+                            System.IO.File.WriteAllText($"output_0{i+1}.txt", strOut.Substring(i * length));    
+                            continue;
+                        }
+                        System.IO.File.WriteAllText($"output_0{i+1}.txt", strOut.Substring(i * length, length));
+                    }
+                } else {
+                    System.Console.WriteLine(fs.Length);
+                }
+            }
         }
 
         public static void ReadExcel (string path) {
