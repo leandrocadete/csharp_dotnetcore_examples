@@ -10,6 +10,7 @@ using Tesseract;
 namespace csharp_dotnetcore_examples {
     class Program {
         static void Main (string[] args) {
+<<<<<<< HEAD
             System.Console.WriteLine("teste");
             //ReadExcel("teste1.xlsx");
             ReadExcelClosedXml("teste_2.xlsx");
@@ -40,8 +41,44 @@ namespace csharp_dotnetcore_examples {
             }
             
             wb.Dispose();
+=======
+            //ReadExcel("teste1.xlsx");
+            Object[][] objs = new object[3][]; // 3 rows
+            for(int i = 0; i < objs.Length; i++) {
+                objs[i] = new object[2]; // columns
+                for(int j = 0; j < 2; j++) {
+                    objs[i][j] = $"{i} {j}";
+                }
+            }
+            //System.Console.WriteLine("");
+            WriteExcel(objs);
+>>>>>>> a137d3995d07cdf8f62d67415a4459bf741cdacc
         }
+        public static void createTesseractBase64 () {
+            string filePath = "por.traineddata";
+            using (System.IO.FileStream fs = new System.IO.FileStream (filePath, System.IO.FileMode.Open)) {
+                if (fs.Length % 4 != 0) {
+                    Int64 qtds = fs.Length;
+                    byte[] buffer = new byte[qtds];
+                    fs.Read (buffer, 0, (int) qtds);
+                    string strOut = System.Convert.ToBase64String (buffer);
 
+                    int length = strOut.Length / 4;
+                    int mod4 = strOut.Length % 4;
+                    System.Console.WriteLine ("length => {0} = {1}/{2}", length, strOut.Length, 4);
+                    for (int i = 0; i < 4; i++) {
+                        System.Console.WriteLine ("substring {0}, {1}", i * length, (i + 1) * length);
+                        if (i == 3) {
+                            System.IO.File.WriteAllText ($"output_0{i+1}.txt", strOut.Substring (i * length));
+                            continue;
+                        }
+                        System.IO.File.WriteAllText ($"output_0{i+1}.txt", strOut.Substring (i * length, length));
+                    }
+                } else {
+                    System.Console.WriteLine (fs.Length);
+                }
+            }
+        }
         public static void ReadExcel (string path) {
 
             using (SpreadsheetDocument doc = SpreadsheetDocument.Open (path, true)) {
@@ -64,8 +101,12 @@ namespace csharp_dotnetcore_examples {
                     Row currentrow = (Row) rows[0].ChildElements.GetItem (i);
 
                     Cell[] cells = new Cell[] {
+<<<<<<< HEAD
                         (Cell) currentrow.ChildElements.GetItem (0)
                         //,(Cell) currentrow.ChildElements.GetItem (1)
+=======
+                        (Cell) currentrow.ChildElements.GetItem (0), (Cell) currentrow.ChildElements.GetItem (1)
+>>>>>>> a137d3995d07cdf8f62d67415a4459bf741cdacc
                         //(Cell) currentrow.ChildElements.GetItem (2)
                         //(Cell) currentrow.ChildElements.GetItem (3)
                     };
@@ -87,8 +128,8 @@ namespace csharp_dotnetcore_examples {
                 strW.Dispose ();
                 strW.Close ();
             }
-#region  ............................ Inner functions ...............................
-            
+            #region  ............................ Inner functions ...............................
+
             string getStringFromCellValue (WorkbookPart wPart, Cell c) {
                 string currCellValue = null;
                 if (c.DataType != null) {
@@ -117,14 +158,13 @@ namespace csharp_dotnetcore_examples {
                 return workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem> ().ElementAt (id);
             }
 
-#endregion ..........................................................................
-        
+            #endregion ..........................................................................
+
         }
         public static void WriteExcel () {
             using (SpreadsheetDocument doc = SpreadsheetDocument.Create (string.Format ("new_doc_{0:yyyy-MM-dd_HHmmss}.xlsx", DateTime.Now), SpreadsheetDocumentType.Workbook)) {
                 WorkbookPart wkPart = doc.AddWorkbookPart ();
                 wkPart.Workbook = new Workbook ();
-
                 // Add WorksheetPart to the WorkbookPart
                 WorksheetPart wsPart = wkPart.AddNewPart<WorksheetPart> ();
                 SheetData sheetData = new SheetData ();
@@ -133,9 +173,6 @@ namespace csharp_dotnetcore_examples {
                 for (int i = 0; i < 10; i++) {
                     matrix[i] = new object[] { "str_" + i, (i + 1) / 100d, DateTime.Now.AddMinutes (-i).ToString ("dd/MM/yyyy"), i * 100 };
                 }
-
-                int rowLength = 10;
-                int cellLength = 5;
                 for (uint i = 0; i < matrix.Length; i++) {
                     Row row = new Row { RowIndex = i + 1u };
 
@@ -156,21 +193,129 @@ namespace csharp_dotnetcore_examples {
                     sheetData.Append (row);
 
                 }
-
                 wsPart.Worksheet = new Worksheet (sheetData);
-
                 // Add Sheets to the Workbook.
                 Sheets sheets = doc.WorkbookPart.Workbook.AppendChild<Sheets> (new Sheets ());
-
                 // Append a new sheet and associate it with the workbook.
                 Sheet sheet = new Sheet ();
                 sheet.Id = doc.WorkbookPart.GetIdOfPart (wsPart);
                 sheet.SheetId = 1;
                 sheet.Name = "sheet_1";
                 sheets.Append (sheet);
-
                 doc.Close ();
+            }
+        }
 
+        public static void WriteExcel (object[][] arrObj) {
+            using (SpreadsheetDocument doc = SpreadsheetDocument.Create ("acoes.xlsx", SpreadsheetDocumentType.Workbook)) {
+                WorkbookPart wkPart = doc.AddWorkbookPart ();
+                wkPart.Workbook = new Workbook ();
+                WorksheetPart wSheetPart = wkPart.AddNewPart<WorksheetPart> ();
+                SheetData sheetData = new SheetData ();
+                for (uint i = 0; i < arrObj.Length; i++) {
+                    Row row = new Row () { RowIndex = i + 1u };
+                    for (int j = 0; j < arrObj[i].Length; j++) {
+                        Cell cell = CreateCellValue(arrObj[i][j]);
+                        row.Append(cell); 
+                    }
+                    row.Append(CreateCellFormula($"=A{i+1}"));
+                    sheetData.Append(row);
+                }
+                wSheetPart.Worksheet = new Worksheet(sheetData);
+                Sheets sheets = doc.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
+                Sheet sheet = new Sheet();
+                sheet.Id = doc.WorkbookPart.GetIdOfPart(wSheetPart);
+                sheet.SheetId = 1;
+                sheet.Name = "sheet_1";
+                sheets.Append(sheet);
+                doc.Close();
+            }
+
+            Cell CreateCellFormula(string str) {
+                return new Cell() {
+                    CellFormula = new CellFormula(str)
+                };
+
+            }
+            Cell CreateCellValue (object o) {
+                if (typeof (double) == o.GetType ()) {
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((double) o)
+                    };
+                } else if (typeof (int) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } else if (typeof (float) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((float) o)
+                    };
+                } else if (typeof (uint) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } else if (typeof (ushort) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } if (typeof (short) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } 
+                if (typeof (ulong) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } 
+                if (typeof (long) == o.GetType ()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((int) o)
+                    };
+                } 
+                if (typeof (string) == o.GetType()) { 
+                    return new Cell() {
+                        DataType = CellValues.String,
+                        CellValue = new CellValue((string) o)
+                    };
+                } 
+                if (typeof (char) == o.GetType()) { 
+                    return new Cell() {
+                        DataType = CellValues.String,
+                        CellValue = new CellValue((char) o)
+                    };
+                } 
+                if (typeof (DateTime) == o.GetType()) { 
+                    return new Cell() {
+                        DataType = CellValues.Date,
+                        CellValue = new CellValue((DateTime) o)
+                    };
+                } 
+                if (typeof (bool) == o.GetType()) { 
+                    return new Cell() {
+                        DataType = CellValues.Boolean,
+                        CellValue = new CellValue((bool) o)
+                    };
+                } 
+                if (typeof (decimal) == o.GetType()) { 
+                    return new Cell() {
+                        DataType = CellValues.Number,
+                        CellValue = new CellValue((decimal) o)
+                    };
+                } 
+                return new Cell() {
+                    DataType = CellValues.String,
+                    CellValue = new CellValue((string) o)
+                };
+                
             }
         }
 
