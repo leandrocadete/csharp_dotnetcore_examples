@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.13.0" />
     <PackageReference Include="LeptonicaSharp" Version="1.77.0.1" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
