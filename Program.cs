@@ -5,9 +5,27 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
+
 namespace csharp_dotnetcore_examples {
     class Program {
         static void Main (string[] args) {
+            
+        }
+
+
+
+
+
+
+        #region ...............................................
+
+        public static void Helper() {
+            // using (var cv = new Converter()){
+            //     OfficeConverte
+            // }
+
+        }
+        public static void HelperWriteExcel() {
             //ReadExcel("teste1.xlsx");
             Object[][] objs = new object[3][]; // 3 rows
             for(int i = 0; i < objs.Length; i++) {
@@ -165,7 +183,6 @@ namespace csharp_dotnetcore_examples {
                 doc.Close ();
             }
         }
-
         public static void WriteExcel (object[][] arrObj) {
             using (SpreadsheetDocument doc = SpreadsheetDocument.Create ("acoes.xlsx", SpreadsheetDocumentType.Workbook)) {
                 WorkbookPart wkPart = doc.AddWorkbookPart ();
@@ -278,5 +295,7 @@ namespace csharp_dotnetcore_examples {
                 
             }
         }
+
+        #endregion ...............................................
     }
 }
