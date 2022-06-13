@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Tesseract;
 
 
 namespace csharp_dotnetcore_examples {
     class Program {
         static void Main (string[] args) {
+
             
         }
 
@@ -26,6 +29,37 @@ namespace csharp_dotnetcore_examples {
 
         }
         public static void HelperWriteExcel() {
+
+            System.Console.WriteLine("teste");
+            //ReadExcel("teste1.xlsx");
+            ReadExcelClosedXml("teste_2.xlsx");
+            // TesseractTest();
+
+            // string path = "./tessdata/por.traineddata";
+            // string pathOut = "por.traineddata.txt";
+            // using(System.IO.FileStream sr = new System.IO.FileStream(path, System.IO.FileMode.Open)) {
+            //     byte[] bs = new byte[sr.Length];
+                
+            //     sr.Read(bs, 0, bs.Length);
+            //     string content = "";
+            //     content = System.Convert.ToBase64String(bs);
+
+            //     System.IO.File.WriteAllText(pathOut,content, System.Text.Encoding.UTF8);
+
+            // }
+        }
+        public static void ReadExcelClosedXml(string path) {
+            
+            var wb = new XLWorkbook(path);
+            
+            var ws = wb.Worksheet(1);
+            for (int i = 1; i < ws.RowsUsed().Count(); i++) {
+                IXLCell c = ws.Cell(i, 1);
+                var str = c.Value.ToString();
+                System.Console.WriteLine("{0}", str);
+            }
+            
+            wb.Dispose();
             //ReadExcel("teste1.xlsx");
             Object[][] objs = new object[3][]; // 3 rows
             for(int i = 0; i < objs.Length; i++) {
@@ -36,6 +70,7 @@ namespace csharp_dotnetcore_examples {
             }
             //System.Console.WriteLine("");
             WriteExcel(objs);
+
         }
         public static void createTesseractBase64 () {
             string filePath = "por.traineddata";
@@ -69,7 +104,7 @@ namespace csharp_dotnetcore_examples {
                 WorkbookPart wPart = doc.WorkbookPart;
 
                 IEnumerable<Sheet> shs = sheets.ChildElements.Cast<Sheet> ();
-                var sheet1 = shs.FirstOrDefault<Sheet> (s => s.Name == "Planilha1"); // get tab by name
+                var sheet1 = shs.FirstOrDefault<Sheet> (/*s => s.Name == "Planilha1"*/); // get tab by name
 
                 Worksheet workSheet = ((WorksheetPart) wPart.GetPartById (sheet1.Id)).Worksheet;
                 List<SheetData> rows = workSheet.ChildElements.OfType<SheetData> ().ToList ();
@@ -83,8 +118,10 @@ namespace csharp_dotnetcore_examples {
 
                     Row currentrow = (Row) rows[0].ChildElements.GetItem (i);
 
-                    Cell[] cells = new Cell[] {
-                        (Cell) currentrow.ChildElements.GetItem (0), (Cell) currentrow.ChildElements.GetItem (1)
+                    Cell[] cells = new Cell[] {                        
+                        (Cell) currentrow.ChildElements.GetItem (0), 
+                        (Cell) currentrow.ChildElements.GetItem (1)
+
                         //(Cell) currentrow.ChildElements.GetItem (2)
                         //(Cell) currentrow.ChildElements.GetItem (3)
                     };
@@ -296,6 +333,33 @@ namespace csharp_dotnetcore_examples {
             }
         }
 
-        #endregion ...............................................
+
+        public static void TesseractTest() {
+            string testImagePath = "img.tif";
+            try
+            {
+                 using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+                 {
+                    using (var img = Pix.LoadFromFile(testImagePath))
+                    {
+                        using (var page = engine.Process(img))
+                        {
+                             var text = page.GetText();
+                             System.Console.WriteLine(text);
+                        }
+                         
+                    }    
+                 }
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+
+
+        }
+    
+
     }
 }
