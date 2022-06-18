@@ -6,13 +6,16 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Tesseract;
+using CadExtensions;
 
 
 namespace csharp_dotnetcore_examples {
     class Program {
         static void Main (string[] args) {
 
-            
+            "string test".Tee(t => Console.WriteLine(t));  
+            "string test".Truncate(15).Tee(t => Console.WriteLine(t)); 
+                      
         }
 
 
@@ -359,7 +362,7 @@ namespace csharp_dotnetcore_examples {
 
 
         }
-    
+    #endregion
 
     }
 }
